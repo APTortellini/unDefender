@@ -152,6 +152,7 @@
     <ClCompile Include="RAII_Handle.cpp" />
     <ClCompile Include="RAII_Hmodule.cpp" />
     <ClCompile Include="RAII_ScHandle.cpp" />
+    <ClCompile Include="SetPrivilege.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

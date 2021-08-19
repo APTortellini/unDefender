@@ -39,6 +39,9 @@
     <ClCompile Include="GetFirstThreadID.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SetPrivilege.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.h">
