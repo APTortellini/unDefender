@@ -10,19 +10,19 @@
 
 #define SYMBOLIC_LINK_ALL_ACCESS (STANDARD_RIGHTS_REQUIRED | 0x1)
 
-typedef NTSTATUS(__stdcall* pNtMakeTemporaryObject)
+typedef NTSTATUS(NTAPI* pNtMakeTemporaryObject)
 (
 	_In_ HANDLE Handle
 );
 
-typedef NTSTATUS(__stdcall* pNtOpenSymbolicLinkObject)
+typedef NTSTATUS(NTAPI* pNtOpenSymbolicLinkObject)
 (
 	_Out_ PHANDLE            LinkHandle,
 	_In_  ACCESS_MASK        DesiredAccess,
 	_In_  POBJECT_ATTRIBUTES ObjectAttributes
 );
 
-typedef NTSTATUS (__stdcall* pNtCreateSymbolicLinkObject)
+typedef NTSTATUS (NTAPI* pNtCreateSymbolicLinkObject)
 (
 	_Out_ PHANDLE LinkHandle,
 	_In_  ACCESS_MASK DesiredAccess,
@@ -30,11 +30,16 @@ typedef NTSTATUS (__stdcall* pNtCreateSymbolicLinkObject)
 	_In_  PUNICODE_STRING LinkTarget
 );
 
-typedef NTSTATUS (__stdcall* pNtImpersonateThread)
+typedef NTSTATUS (NTAPI* pNtImpersonateThread)
 (
 	_In_ HANDLE ServerThreadHandle,
 	_In_ HANDLE ClientThreadHandle,
 	_In_ PSECURITY_QUALITY_OF_SERVICE SecurityQos
+);
+
+typedef NTSTATUS (NTAPI* pNtUnloadDriver)
+(
+	_In_  PUNICODE_STRING DriverServiceName
 );
 
 NTSTATUS ChangeSymlink
@@ -57,3 +62,11 @@ DWORD GetFirstThreadID
 (
 	_In_ DWORD dwOwnerPID
 );
+
+bool SetPrivilege(
+	_In_ HANDLE token,
+	_In_ std::wstring privilege,
+	_In_ bool enableDisable
+);
+
+NTSTATUS ImpersonateAndUnload();

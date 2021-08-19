@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="RAII code">
+      <UniqueIdentifier>{0356262e-9bba-489d-ad22-17e175dae9a0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -24,16 +27,7 @@
     <ClCompile Include="FindPID.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RAII_Handle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RAII_Hmodule.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Error.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RAII_ScHandle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GetFirstThreadID.cpp">
@@ -42,13 +36,25 @@
     <ClCompile Include="SetPrivilege.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ImpersonateAndUnload.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RAII_Handle.cpp">
+      <Filter>RAII code</Filter>
+    </ClCompile>
+    <ClCompile Include="RAII_Hmodule.cpp">
+      <Filter>RAII code</Filter>
+    </ClCompile>
+    <ClCompile Include="RAII_ScHandle.cpp">
+      <Filter>RAII code</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="raii.h">
-      <Filter>Header Files</Filter>
+      <Filter>RAII code</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
