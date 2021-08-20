@@ -148,6 +148,7 @@
     <ClCompile Include="Error.cpp" />
     <ClCompile Include="FindPID.cpp" />
     <ClCompile Include="GetFirstThreadID.cpp" />
+    <ClCompile Include="GetSymbolicLinkTarget.cpp" />
     <ClCompile Include="ImpersonateAndUnload.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="RAII_Handle.cpp" />

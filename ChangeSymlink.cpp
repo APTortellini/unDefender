@@ -7,7 +7,7 @@ NTSTATUS ChangeSymlink(_In_ std::wstring symLinkName, _In_ std::wstring newDesti
 	RAII::Hmodule ntdllModule = LoadLibraryW(L"ntdll.dll");
 	if (!ntdllModule.GetHmodule())
 	{
-		std::cout << "[-] Couldn't resolve ntdll address! Error: 0x" << std::hex << GetLastError() << std::endl;
+		std::cout << "[-] Couldn't open a handle to ntdll! Error: 0x" << std::hex << GetLastError() << std::endl;
 		return STATUS_UNSUCCESSFUL;
 	}
 	pNtMakeTemporaryObject NtMakeTemporaryObject = (pNtMakeTemporaryObject)GetProcAddress(ntdllModule.GetHmodule(), "NtMakeTemporaryObject");
@@ -17,13 +17,13 @@ NTSTATUS ChangeSymlink(_In_ std::wstring symLinkName, _In_ std::wstring newDesti
 		return STATUS_UNSUCCESSFUL;
 	}
 	pNtOpenSymbolicLinkObject NtOpenSymbolicLinkObject = (pNtOpenSymbolicLinkObject)GetProcAddress(ntdllModule.GetHmodule(), "NtOpenSymbolicLinkObject");
-	if (!NtMakeTemporaryObject)
+	if (!NtOpenSymbolicLinkObject)
 	{
 		std::cout << "[-] Couldn't resolve NtOpenSymbolicLinkObject address! Error: 0x" << std::hex << GetLastError() << std::endl;
 		return STATUS_UNSUCCESSFUL;
 	}
 	pNtCreateSymbolicLinkObject NtCreateSymbolicLinkObject = (pNtCreateSymbolicLinkObject)GetProcAddress(ntdllModule.GetHmodule(), "NtCreateSymbolicLinkObject");
-	if (!NtMakeTemporaryObject)
+	if (!NtCreateSymbolicLinkObject)
 	{
 		std::cout << "[-] Couldn't resolve NtCreateSymbolicLinkObject address! Error: 0x" << std::hex << GetLastError() << std::endl;
 		return STATUS_UNSUCCESSFUL;
@@ -32,7 +32,6 @@ NTSTATUS ChangeSymlink(_In_ std::wstring symLinkName, _In_ std::wstring newDesti
 #pragma region changing_symlink
 	// build OBJECT_ATTRIBUTES structure to reference and then delete the permanent symbolic link to the driver path
 	UNICODE_STRING symlinkPath;
-	//RtlInitUnicodeString(&symlinkPath, L"\\Device\\BootDevice");
 	RtlInitUnicodeString(&symlinkPath, symLinkName.c_str());
 	OBJECT_ATTRIBUTES symlinkObjAttr{};
 	InitializeObjectAttributes(&symlinkObjAttr, &symlinkPath, OBJ_KERNEL_HANDLE, NULL, NULL);
@@ -41,6 +40,8 @@ NTSTATUS ChangeSymlink(_In_ std::wstring symLinkName, _In_ std::wstring newDesti
 	NTSTATUS status = NtOpenSymbolicLinkObject(&symlinkHandle, DELETE, &symlinkObjAttr);
 	if (status == STATUS_SUCCESS)
 	{
+		// NtMakeTemporaryObject is used to decrement the reference count of the symlink object
+		// as those links are created with the permanent attribute (and get a fake +1 reference in the kernelspace ref counter)
 		status = NtMakeTemporaryObject(symlinkHandle);
 		CloseHandle(symlinkHandle);
 		if (status != STATUS_SUCCESS)
@@ -56,7 +57,7 @@ NTSTATUS ChangeSymlink(_In_ std::wstring symLinkName, _In_ std::wstring newDesti
 		return status;
 	}
 
-	// now recreate the symbolic link to make it point to the UEFI partition (which is \Device\HardDiskVolume1
+	// now recreate the symbolic link to make it point to the new destintation
 	UNICODE_STRING target;
 	RtlInitUnicodeString(&target, newDestination.c_str());
 	UNICODE_STRING newSymLinkPath;
@@ -72,6 +73,8 @@ NTSTATUS ChangeSymlink(_In_ std::wstring symLinkName, _In_ std::wstring newDesti
 		return status;
 	}
 	else std::wcout << L"[+] Symbolic link " << symLinkName << L" to " << newDestination << L" created!" << std::endl;
+	CloseHandle(newSymLinkHandle); // IMPORTANT!! If the handle is not closed it won't be possible to call this function again to restore the symlink
+	return STATUS_SUCCESS;
 
 #pragma endregion the symbolic link BootDevice is deleted and recreated to make it point to the UEFI partition
 }

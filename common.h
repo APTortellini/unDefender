@@ -6,9 +6,11 @@
 #include <TlHelp32.h>
 #include <iostream>
 #include <algorithm>
+#include <thread>
 #include "raii.h"
 
 #define SYMBOLIC_LINK_ALL_ACCESS (STANDARD_RIGHTS_REQUIRED | 0x1)
+#define SYMBOLIC_LINK_QUERY 0x0001
 
 typedef NTSTATUS(NTAPI* pNtMakeTemporaryObject)
 (
@@ -42,6 +44,13 @@ typedef NTSTATUS (NTAPI* pNtUnloadDriver)
 	_In_  PUNICODE_STRING DriverServiceName
 );
 
+typedef NTSTATUS(NTAPI* pNtQuerySymbolicLinkObject)
+(
+	_In_      HANDLE          LinkHandle,
+	_Inout_   PUNICODE_STRING LinkTarget,
+	_Out_opt_ PULONG          ReturnedLength
+);
+
 NTSTATUS ChangeSymlink
 (
 	_In_ std::wstring symLinkName, 
@@ -70,3 +79,8 @@ bool SetPrivilege(
 );
 
 NTSTATUS ImpersonateAndUnload();
+
+std::wstring GetSymbolicLinkTarget
+(
+	_In_ std::wstring symLinkName
+);

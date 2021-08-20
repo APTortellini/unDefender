@@ -48,6 +48,9 @@
     <ClCompile Include="RAII_ScHandle.cpp">
       <Filter>RAII code</Filter>
     </ClCompile>
+    <ClCompile Include="GetSymbolicLinkTarget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.h">
