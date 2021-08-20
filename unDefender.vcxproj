@@ -158,6 +158,7 @@
     <ClCompile Include="SetPrivilege.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="README.md" />
     <None Include="WdFilter.sys" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
