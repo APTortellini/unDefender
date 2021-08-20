@@ -60,4 +60,9 @@
       <Filter>RAII code</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="WdFilter.sys">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>

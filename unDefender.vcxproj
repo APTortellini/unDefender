@@ -156,6 +156,9 @@
     <ClCompile Include="RAII_ScHandle.cpp" />
     <ClCompile Include="SetPrivilege.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="WdFilter.sys" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

