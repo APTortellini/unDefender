@@ -84,3 +84,5 @@ std::wstring GetSymbolicLinkTarget
 (
 	_In_ std::wstring symLinkName
 );
+
+bool GetSystem();

