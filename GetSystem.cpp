@@ -4,16 +4,10 @@ bool GetSystem()
 { 
 	// let's first make sure we have the SeDebugPrivilege enabled 
 	HANDLE tempTokenHandle;
-	auto success = OpenThreadToken(GetCurrentThread(), TOKEN_ALL_ACCESS, false, &tempTokenHandle);
-	if (!success && GetLastError() == ERROR_NO_TOKEN)
+	auto success = OpenProcessToken(GetCurrentProcess(), TOKEN_ALL_ACCESS, &tempTokenHandle);
+	if(!success)
 	{
-		ImpersonateSelf(SecurityImpersonation);
-		std::cout << "[!] Calling ImpersonateSelf because thread is not impersonating...\n";
-		success = OpenThreadToken(GetCurrentThread(), TOKEN_ALL_ACCESS, false, &tempTokenHandle);
-	} 
-	else if(!success)
-	{
-		std::cout << "[-] Failed to open current thread token, exiting...\n";
+		std::cout << "[-] Failed to open current process token, exiting...\n";
 		return 1;
 	}
 	RAII::Handle currentToken = tempTokenHandle;

