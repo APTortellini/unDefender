@@ -155,6 +155,5 @@ NTSTATUS ImpersonateAndUnload()
 		std::cout << "[-] Failed to unload Wdfilter...\n";
 	}
 #pragma endregion Wdfilter is unloaded
-
 	return status;
 }
