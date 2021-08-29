@@ -90,7 +90,7 @@ NTSTATUS ImpersonateAndUnload()
 	if (status == STATUS_SUCCESS) std::cout << "[+] Successfully impersonated TrustedInstaller token!\n";
 	else
 	{
-		Error(GetLastError());
+		Error(RtlNtStatusToDosError(status));
 		std::cout << "[-] Failed to impersonate TrustedInstaller...\n";
 		return 1;
 	}
@@ -150,7 +150,8 @@ NTSTATUS ImpersonateAndUnload()
 	}
 	else
 	{
-		Error(status);
+		
+		Error(RtlNtStatusToDosError(status));
 		std::cout << "[-] Failed to unload Wdfilter...\n";
 	}
 #pragma endregion Wdfilter is unloaded
