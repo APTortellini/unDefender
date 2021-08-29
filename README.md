@@ -7,7 +7,7 @@ At its core, this technique revolves around changing the \Device\BootDevice symb
 __Requirements__
 - Compile unDefender.exe in Release x64 configuration;
 - Place unDefender.exe and the provided WdFilter.sys in the same folder;
-- Run an elevated powershell.exe (we need the debug privilege, which cmd usually doesn't have) and navigate to said folder;
+- Run an elevated cmd.exe/powershell.exe and navigate to said folder;
 - `.\unDefender.exe`
 - Profit :)
 
