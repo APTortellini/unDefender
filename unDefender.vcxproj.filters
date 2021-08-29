@@ -64,10 +64,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="WdFilter.sys">
+    <None Include="README.md">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="README.md">
+    <None Include="legit.sys">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

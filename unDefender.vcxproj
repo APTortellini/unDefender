@@ -158,8 +158,8 @@
     <ClCompile Include="SetPrivilege.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="legit.sys" />
     <None Include="README.md" />
-    <None Include="WdFilter.sys" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
