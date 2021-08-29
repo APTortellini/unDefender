@@ -150,7 +150,6 @@ NTSTATUS ImpersonateAndUnload()
 	}
 	else
 	{
-		
 		Error(RtlNtStatusToDosError(status));
 		std::cout << "[-] Failed to unload Wdfilter...\n";
 	}
