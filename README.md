@@ -14,4 +14,4 @@ __Requirements__
 __Tested on__
 - [x] Windows 10 20H2
 - [x] Windows 10 21H1
-- [ ] Windows 11
+- [x] Windows 11
