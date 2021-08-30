@@ -1,8 +1,10 @@
 #pragma once
 #pragma comment(lib,"ntdll.lib")
+
+#include <ntstatus.h>
+#define WIN32_NO_STATUS // needed to prevent winternl.h from redefining macros defined by ntstatus.h 
 #include <Windows.h>
 #include <winternl.h>
-#include <ntstatus.h>
 #include <TlHelp32.h>
 #include <iostream>
 #include <algorithm>
